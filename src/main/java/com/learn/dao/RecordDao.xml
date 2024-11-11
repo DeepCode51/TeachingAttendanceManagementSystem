@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.learn.dao.RecordDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.learn.entity.RecordEntity" id="recordMap">
+        <result property="id" column="id"/>
+        <result property="day" column="day"/>
+        <result property="user" column="user"/>
+        <result property="state" column="state"/>
+        <result property="remark" column="remark"/>
+        <result property="type" column="type"/>
+        <result property="gmttime" column="gmtTime"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.learn.entity.RecordEntity">
+		select * from record where id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.learn.entity.RecordEntity">
+        select * from record where 1=1
+        <if test="day != null and day != ''">
+            and day like '%${day}%'
+        </if>
+
+        <if test="user != null and user != ''">
+            and user = #{user}
+        </if>
+
+        <if test="type != null and type != ''">
+            and type = #{type}
+        </if>
+
+
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from record where 1=1
+        <if test="day != null and day != ''">
+            and day like '%${day}%'
+        </if>
+        <if test="user != null and user != ''">
+            and user = #{user}
+        </if>
+        <if test="type != null and type != ''">
+            and type = #{type}
+        </if>
+    </select>
+
+    <insert id="save" parameterType="com.learn.entity.RecordEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into record
+		(
+			`day`, 
+			`user`, 
+			`state`, 
+			`remark`, 
+			`type`, 
+			`gmtTime`
+		)
+		values
+		(
+			#{day}, 
+			#{user}, 
+			#{state}, 
+			#{remark}, 
+			#{type}, 
+			#{gmttime}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.learn.entity.RecordEntity">
+        update record
+        <set>
+            <if test="day != null">`day` = #{day},</if>
+            <if test="user != null">`user` = #{user},</if>
+            <if test="state != null">`state` = #{state},</if>
+            <if test="remark != null">`remark` = #{remark},</if>
+            <if test="type != null">`type` = #{type},</if>
+            <if test="gmttime != null">`gmtTime` = #{gmttime}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from record where id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        delete from record where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

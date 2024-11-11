@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.learn.dao.MsgDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.learn.entity.MsgEntity" id="msgMap">
+        <result property="id" column="id"/>
+        <result property="content" column="content"/>
+        <result property="user" column="user"/>
+        <result property="gmttime" column="gmtTime"/>
+        <result property="state" column="state"/>
+    </resultMap>
+
+    <select id="queryObject" resultType="com.learn.entity.MsgEntity">
+		select * from msg where id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.learn.entity.MsgEntity">
+        select * from msg where 1=1
+        <if test="content != null and content != ''">
+            and content like '%${content}%'
+        </if>
+
+        <if test="user != null and user != ''">
+            and user = #{user}
+        </if>
+
+
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from msg where 1=1
+        <if test="content != null and content != ''">
+            and content like '%${content}%'
+        </if>
+        <if test="user != null and user != ''">
+            and user = #{user}
+        </if>
+    </select>
+
+    <insert id="save" parameterType="com.learn.entity.MsgEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into msg
+		(
+			`content`, 
+			`user`, 
+			`gmtTime`, 
+			`state`
+		)
+		values
+		(
+			#{content}, 
+			#{user}, 
+			#{gmttime}, 
+			#{state}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.learn.entity.MsgEntity">
+        update msg
+        <set>
+            <if test="content != null">`content` = #{content},</if>
+            <if test="user != null">`user` = #{user},</if>
+            <if test="gmttime != null">`gmtTime` = #{gmttime},</if>
+            <if test="state != null">`state` = #{state}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from msg where id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        delete from msg where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

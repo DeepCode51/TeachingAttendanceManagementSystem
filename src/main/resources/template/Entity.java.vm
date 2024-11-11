@@ -1,0 +1,72 @@
+package ${package}.entity;
+
+        import java.io.Serializable;
+        import java.util.Date;
+        import ${package}.service.*;
+
+#if(${hasBigDecimal})
+        import java.math.BigDecimal;
+#end
+
+
+/**
+ * ${comments}
+ *
+ * @author ${author}
+ * @email ${email}
+ * @date ${datetime}
+ */
+public class ${className}Entity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    #foreach ($column in $columns)
+        //$column.comments
+        #if($column.attrname ==  'gmttime')
+            private $column.attrType $column.attrname =new  Date();
+        #elseif($column.attrname ==  'user')
+            private $column.attrType $column.attrname;
+
+            private SysUserEntity sysUserEntity;
+
+            public SysUserEntity getSysUserEntity() {
+                return sysUserEntity;
+            }
+
+            public void setSysUserEntity(SysUserEntity sysUserEntity) {
+                this.sysUserEntity = sysUserEntity;
+            }
+
+        #elseif($column.attrType ==  'Long' && $column.attrname !=  'id')
+            private $column.attrType $column.attrname;
+
+            private  ${column.attrName}Entity  ${column.attrname}Entity;
+
+            public ${column.attrName}Entity get${column.attrName}Entity() {
+                return ${column.attrname}Entity;
+            }
+
+            public void set${column.attrName}Entity(${column.attrName}Entity ${column.attrname}Entity) {
+                this.${column.attrname}Entity = ${column.attrname}Entity;
+            }
+        #else
+            private $column.attrType $column.attrname;
+        #end
+
+    #end
+
+    #foreach ($column in $columns)
+        /**
+         * 设置：${column.comments}
+         */
+        public void set${column.attrName}($column.attrType $column.attrname) {
+            this.$column.attrname = $column.attrname;
+        }
+
+        /**
+         * 获取：${column.comments}
+         */
+        public $column.attrType get${column.attrName}() {
+            return $column.attrname;
+        }
+    #end
+}
